@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	jamf "github.com/DataDog/jamf-api-client-go/classic"
 	"github.com/stretchr/testify/assert"
@@ -15,6 +16,11 @@ import (
 
 type MockResponse struct {
 	Status string `json:"status"`
+}
+
+var testToken = jamf.JamfToken{
+	Token:   "abcdefghijklmnopqrstuvwxyz",
+	Expires: time.Now().Add(time.Hour).Format(time.RFC3339),
 }
 
 func clientResponseMock(t *testing.T) *httptest.Server {
@@ -39,6 +45,7 @@ func TestNewClient(t *testing.T) {
 	defer testServer.Close()
 
 	j, err := jamf.NewClient(testServer.URL, "fake-username", "mock-password-cool", nil)
+	j.Token = &testToken
 	assert.Nil(t, err)
 	assert.Equal(t, "fake-username", j.Username)
 	assert.Equal(t, "mock-password-cool", j.Password)
@@ -54,10 +61,9 @@ func TestNewClient(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, "application/json, application/xml;q=0.9", formattedRequest.Header.Get("Accept"))
 
-	sentUsername, sentPwd, ok := formattedRequest.BasicAuth()
-	assert.True(t, ok)
-	assert.Equal(t, j.Username, sentUsername)
-	assert.Equal(t, j.Password, sentPwd)
+	sentToken := formattedRequest.Header.Get("Authorization")
+	assert.NotEmpty(t, sentToken)
+	assert.Equal(t, fmt.Sprintf("Bearer %s", j.Token.Token), sentToken)
 	assert.Equal(t, statusResponse.Status, "OK")
 }
 

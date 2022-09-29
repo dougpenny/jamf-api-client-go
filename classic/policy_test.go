@@ -95,6 +95,7 @@ func TestGetAllPolicies(t *testing.T) {
 	testServer := policiesResponseMocks(t)
 	defer testServer.Close()
 	j, err := jamf.NewClient(testServer.URL, "fake-username", "mock-password-cool", nil)
+	j.Token = &testToken
 	assert.Nil(t, err)
 	res, err := j.Policies()
 	assert.Nil(t, err)
@@ -108,6 +109,7 @@ func TestGetSpecificPolicyByID(t *testing.T) {
 	testServer := policiesResponseMocks(t)
 	defer testServer.Close()
 	j, err := jamf.NewClient(testServer.URL, "fake-username", "mock-password-cool", nil)
+	j.Token = &testToken
 	assert.Nil(t, err)
 	policy, err := j.PolicyDetails(72)
 	assert.Nil(t, err)
@@ -119,6 +121,7 @@ func TestGetSpecificPolicyByName(t *testing.T) {
 	testServer := policiesResponseMocks(t)
 	defer testServer.Close()
 	j, err := jamf.NewClient(testServer.URL, "fake-username", "mock-password-cool", nil)
+	j.Token = &testToken
 	assert.Nil(t, err)
 	policy, err := j.PolicyDetails("Test Policy")
 	assert.Nil(t, err)
@@ -130,6 +133,7 @@ func TestUpdatePolicy(t *testing.T) {
 	testServer := policiesResponseMocks(t)
 	defer testServer.Close()
 	j, err := jamf.NewClient(testServer.URL, "fake-username", "mock-password-cool", nil)
+	j.Token = &testToken
 	assert.Nil(t, err)
 
 	updates := &jamf.PolicyContents{
@@ -166,6 +170,7 @@ func TestCreatePolicy(t *testing.T) {
 	testServer := policiesResponseMocks(t)
 	defer testServer.Close()
 	j, err := jamf.NewClient(testServer.URL, "fake-username", "mock-password-cool", nil)
+	j.Token = &testToken
 	assert.Nil(t, err)
 
 	newPolicy := &jamf.PolicyContents{
@@ -229,6 +234,7 @@ func DeletePolicy(t *testing.T) {
 	testServer := policiesResponseMocks(t)
 	defer testServer.Close()
 	j, err := jamf.NewClient(testServer.URL, "fake-username", "mock-password-cool", nil)
+	j.Token = &testToken
 	assert.Nil(t, err)
 	removed, err := j.DeletePolicy(72)
 	assert.Nil(t, err)

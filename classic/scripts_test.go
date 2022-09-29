@@ -109,6 +109,7 @@ func TestGetAllScripts(t *testing.T) {
 	testServer := scriptsResponseMocks(t)
 	defer testServer.Close()
 	j, err := jamf.NewClient(testServer.URL, "fake-username", "mock-password-cool", nil)
+	j.Token = &testToken
 	assert.Nil(t, err)
 	scripts, err := j.Scripts()
 	assert.Nil(t, err)
@@ -122,6 +123,7 @@ func TestGetSpecificScriptByID(t *testing.T) {
 	testServer := scriptsResponseMocks(t)
 	defer testServer.Close()
 	j, err := jamf.NewClient(testServer.URL, "fake-username", "mock-password-cool", nil)
+	j.Token = &testToken
 	assert.Nil(t, err)
 	script, err := j.ScriptDetails(33)
 	assert.Nil(t, err)
@@ -133,6 +135,7 @@ func TestGetSpecificScriptByName(t *testing.T) {
 	testServer := scriptsResponseMocks(t)
 	defer testServer.Close()
 	j, err := jamf.NewClient(testServer.URL, "fake-username", "mock-password-cool", nil)
+	j.Token = &testToken
 	assert.Nil(t, err)
 	script, err := j.ScriptDetails(33)
 	assert.Nil(t, err)
@@ -144,6 +147,7 @@ func TestUpdateScript(t *testing.T) {
 	testServer := scriptsResponseMocks(t)
 	defer testServer.Close()
 	j, err := jamf.NewClient(testServer.URL, "fake-username", "mock-password-cool", nil)
+	j.Token = &testToken
 	assert.Nil(t, err)
 
 	update := &jamf.ScriptContents{
@@ -159,6 +163,7 @@ func TestCreateScript(t *testing.T) {
 	testServer := scriptsResponseMocks(t)
 	defer testServer.Close()
 	j, err := jamf.NewClient(testServer.URL, "fake-username", "mock-password-cool", nil)
+	j.Token = &testToken
 	assert.Nil(t, err)
 
 	newScript := &jamf.ScriptContents{
@@ -177,6 +182,7 @@ func TestCreateScriptRequiredContent(t *testing.T) {
 	testServer := scriptsResponseMocks(t)
 	defer testServer.Close()
 	j, err := jamf.NewClient(testServer.URL, "fake-username", "mock-password-cool", nil)
+	j.Token = &testToken
 	assert.Nil(t, err)
 
 	newScript := &jamf.ScriptContents{}
@@ -197,6 +203,7 @@ func TestDeleteScript(t *testing.T) {
 	testServer := scriptsResponseMocks(t)
 	defer testServer.Close()
 	j, err := jamf.NewClient(testServer.URL, "fake-username", "mock-password-cool", nil)
+	j.Token = &testToken
 	assert.Nil(t, err)
 	removed, err := j.DeleteScript(33)
 	assert.Nil(t, err)

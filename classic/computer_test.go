@@ -203,6 +203,7 @@ func TestListComputers(t *testing.T) {
 	testServer := computerResponseMocks(t)
 	defer testServer.Close()
 	j, err := jamf.NewClient(testServer.URL, "fake-username", "mock-password-cool", nil)
+	j.Token = &testToken
 	assert.Nil(t, err)
 	computers, err := j.Computers()
 	assert.Nil(t, err)
@@ -216,6 +217,7 @@ func TestQuerySpecificComputer(t *testing.T) {
 	testServer := computerResponseMocks(t)
 	defer testServer.Close()
 	j, err := jamf.NewClient(testServer.URL, "fake-username", "mock-password-cool", nil)
+	j.Token = &testToken
 	assert.Nil(t, err)
 	computer, err := j.ComputerDetails(82)
 	assert.Nil(t, err)
@@ -264,6 +266,7 @@ func TestGetComputer__ID(t *testing.T) {
 	testServer := computerResponseMocks(t)
 	defer testServer.Close()
 	j, err := jamf.NewClient(testServer.URL, "fake-username", "mock-password-cool", nil)
+	j.Token = &testToken
 	assert.Nil(t, err)
 
 	id := &jamf.ComputerIdentifier{
@@ -280,6 +283,7 @@ func TestGetComputer__SerialNumber(t *testing.T) {
 	testServer := computerResponseMocks(t)
 	defer testServer.Close()
 	j, err := jamf.NewClient(testServer.URL, "fake-username", "mock-password-cool", nil)
+	j.Token = &testToken
 	assert.Nil(t, err)
 
 	id := &jamf.ComputerIdentifier{
@@ -297,6 +301,7 @@ func TestUpdateComputer__SerialNumber(t *testing.T) {
 	testServer := computerResponseMocks(t)
 	defer testServer.Close()
 	j, err := jamf.NewClient(testServer.URL, "fake-username", "mock-password-cool", nil)
+	j.Token = &testToken
 	assert.Nil(t, err)
 
 	update := &jamf.ComputerDetails{

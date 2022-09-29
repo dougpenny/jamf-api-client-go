@@ -109,6 +109,7 @@ func TestQueryAllClasses(t *testing.T) {
 	testServer := classResponseMocks(t)
 	defer testServer.Close()
 	j, err := jamf.NewClient(testServer.URL, "fake-username", "mock-password-cool", nil)
+	j.Token = &testToken
 	assert.Nil(t, err)
 	classes, err := j.Classes()
 	assert.Nil(t, err)
@@ -122,6 +123,7 @@ func TestQuerySpecificClassByName(t *testing.T) {
 	testServer := classResponseMocks(t)
 	defer testServer.Close()
 	j, err := jamf.NewClient(testServer.URL, "fake-username", "mock-password-cool", nil)
+	j.Token = &testToken
 	assert.Nil(t, err)
 	class, err := j.ClassDetails("1st - Math")
 	assert.Nil(t, err)
@@ -134,6 +136,7 @@ func TestQuerySpecificClassByID(t *testing.T) {
 	testServer := classResponseMocks(t)
 	defer testServer.Close()
 	j, err := jamf.NewClient(testServer.URL, "fake-username", "mock-password-cool", nil)
+	j.Token = &testToken
 	assert.Nil(t, err)
 	class, err := j.ClassDetails(6243)
 	assert.Nil(t, err)
@@ -147,6 +150,7 @@ func TestUpdateClass(t *testing.T) {
 	testServer := classResponseMocks(t)
 	defer testServer.Close()
 	j, err := jamf.NewClient(testServer.URL, "fake-username", "mock-password-cool", nil)
+	j.Token = &testToken
 	assert.Nil(t, err)
 
 	update := &jamf.Class{
@@ -166,6 +170,7 @@ func TestCreateClass(t *testing.T) {
 	testServer := classResponseMocks(t)
 	defer testServer.Close()
 	j, err := jamf.NewClient(testServer.URL, "fake-username", "mock-password-cool", nil)
+	j.Token = &testToken
 	assert.Nil(t, err)
 
 	newClass := &jamf.Class{}
@@ -203,6 +208,7 @@ func TestDeleteClass(t *testing.T) {
 	testServer := classResponseMocks(t)
 	defer testServer.Close()
 	j, err := jamf.NewClient(testServer.URL, "fake-username", "mock-password-cool", nil)
+	j.Token = &testToken
 	assert.Nil(t, err)
 	removed, err := j.DeleteClass(6243)
 	assert.Nil(t, err)

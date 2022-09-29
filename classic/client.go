@@ -4,6 +4,7 @@
 package classic
 
 import (
+	"context"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
@@ -31,8 +32,15 @@ type Client struct {
 	Username string
 	Password string
 	Endpoint string
+	Token    *JamfToken
 	logger   *logrus.Logger
 	api      *http.Client
+}
+
+// JamfToken represents the bearer token required for client authentication
+type JamfToken struct {
+	Token   string `json:"token"`
+	Expires string `json:"expires"`
 }
 
 // Used if custom client not passed on when NewClient instantiated
@@ -57,18 +65,76 @@ func NewClient(domain string, username string, password string, client *http.Cli
 		Username: username,
 		Password: password,
 		Endpoint: fmt.Sprintf("%s/JSSResource", domain),
+		Token:    &JamfToken{},
 		api:      client,
 	}, nil
 }
 
+func (j *Client) requestToken() error {
+	// Create endpoint for token request
+	endpoint := fmt.Sprintf("%s/api/v1/auth/token", j.Domain)
+
+	req, err := http.NewRequestWithContext(context.Background(), "POST", endpoint, http.NoBody)
+	if err != nil {
+		return errors.Wrapf(err, "error creating bearer token request")
+	}
+	req.SetBasicAuth(j.Username, j.Password)
+
+	res, err := j.api.Do(req)
+	if err != nil {
+		return errors.Wrapf(err, "error making %s request to %s", req.Method, req.URL)
+	}
+	defer res.Body.Close()
+
+	// If status code is not ok attempt to read the response in plain text
+	if res.StatusCode != 200 && res.StatusCode != 201 {
+		responseData, err := io.ReadAll(res.Body)
+		if err != nil {
+			return errors.Wrapf(err, "request error: %s. unable to retrieve plain text response: %s", res.Status, err.Error())
+		}
+		return fmt.Errorf("request error: %s", string(responseData))
+	}
+
+	if err = json.NewDecoder(res.Body).Decode(j.Token); err != nil {
+		return errors.Wrapf(err, "response was successful but error occured decoding JSON token response")
+	}
+
+	return nil
+}
+
+func (j *Client) checkTokenExpiration() error {
+	// Check for the existance of a bearer token and, if we already have a token,
+	// check the expiration timestamp
+	if j.Token.Expires != "" {
+		tokenExpires, err := time.Parse(time.RFC3339, j.Token.Expires)
+		if err != nil {
+			return errors.Wrapf(err, "error parsing the bearer token expiration date: %s", j.Token.Expires)
+		}
+		if time.Until(tokenExpires) > (time.Minute * 5) {
+			return nil
+		}
+	}
+	err := j.requestToken()
+	if err != nil {
+		return errors.Wrapf(err, "error requesting new bearer token")
+	}
+
+	return nil
+}
+
 func (j *Client) makeAPIrequest(r *http.Request, v interface{}) error {
+	err := j.checkTokenExpiration()
+	if err != nil {
+		return errors.Wrapf(err, "error checking for bearer token expiration")
+	}
+
 	// Jamf API only sends XML for some endpoints so we will accept both but prioritize
 	// JSON responses with the quallity value of 1.0 and 0.9 for XML responses
 	// https://developer.mozilla.org/en-US/docs/Glossary/quality_values
 	r.Header.Set("Accept", "application/json, application/xml;q=0.9")
 	r.Header.Set("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0, post-check=0, pre-check=0")
 	r.Header.Set("Strict-Transport-Security", "max-age=31536000 ; includeSubDomains")
-	r.SetBasicAuth(j.Username, j.Password)
+	r.Header.Set("Authorization", fmt.Sprintf("Bearer %s", j.Token.Token))
 
 	res, err := j.api.Do(r)
 	if err != nil {

@@ -103,6 +103,7 @@ func TestQueryAllComputerExtAttrs(t *testing.T) {
 	testServer := computerExtAttrResponseMocks(t)
 	defer testServer.Close()
 	j, err := jamf.NewClient(testServer.URL, "fake-username", "mock-password-cool", nil)
+	j.Token = &testToken
 	assert.Nil(t, err)
 	compExtAttrs, err := j.ComputerExtensionAttributes()
 	assert.Nil(t, err)
@@ -116,6 +117,7 @@ func TestQuerySpecificComputerExtAttrByName(t *testing.T) {
 	testServer := computerExtAttrResponseMocks(t)
 	defer testServer.Close()
 	j, err := jamf.NewClient(testServer.URL, "fake-username", "mock-password-cool", nil)
+	j.Token = &testToken
 	assert.Nil(t, err)
 	cea, err := j.ComputerExtensionAttributeDetails("Check Firewall")
 	assert.Nil(t, err)
@@ -134,6 +136,7 @@ func TestQuerySpecificComputerExtAttrByID(t *testing.T) {
 	testServer := computerExtAttrResponseMocks(t)
 	defer testServer.Close()
 	j, err := jamf.NewClient(testServer.URL, "fake-username", "mock-password-cool", nil)
+	j.Token = &testToken
 	assert.Nil(t, err)
 	cea, err := j.ComputerExtensionAttributeDetails(33)
 	assert.Nil(t, err)
@@ -152,6 +155,7 @@ func TestUpdateComputerExtAttr(t *testing.T) {
 	testServer := computerExtAttrResponseMocks(t)
 	defer testServer.Close()
 	j, err := jamf.NewClient(testServer.URL, "fake-username", "mock-password-cool", nil)
+	j.Token = &testToken
 	assert.Nil(t, err)
 
 	update := &jamf.ComputerExtensionAttribute{
@@ -169,6 +173,7 @@ func TestCreateComputerExtAttr(t *testing.T) {
 	testServer := computerExtAttrResponseMocks(t)
 	defer testServer.Close()
 	j, err := jamf.NewClient(testServer.URL, "fake-username", "mock-password-cool", nil)
+	j.Token = &testToken
 	assert.Nil(t, err)
 
 	newCompExtAttr := &jamf.ComputerExtensionAttribute{}
@@ -201,6 +206,7 @@ func TestDeleteComputerExtAttr(t *testing.T) {
 	testServer := computerExtAttrResponseMocks(t)
 	defer testServer.Close()
 	j, err := jamf.NewClient(testServer.URL, "fake-username", "mock-password-cool", nil)
+	j.Token = &testToken
 	assert.Nil(t, err)
 	removed, err := j.DeleteComputerExtensionAttribute(33)
 	assert.Nil(t, err)
