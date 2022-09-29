@@ -1,5 +1,6 @@
 ## 1.0.0.beta.4
 - Adds support for `/classes` endpoint
+- Adds support for bearer token authentication
 ## 1.0.0.beta.3
 - Refactors list methods to return list of objects by default i.e `j.Computers() => []BasicComputerInfo`.
 - Refactors list related structs to use `List` key
